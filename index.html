@@ -814,6 +814,11 @@
   var cachedPdfKey = null;
 
   var PDF_MARGIN = 32; // pt, on all four sides of every page
+  // html2canvas lays out its clone of the page in a window this wide, so
+  // every PDF gets the desktop report layout (900px cap, two-column
+  // cards, desktop type sizes) whatever device the respondent used. Only
+  // the off-screen clone sees this width; the live page is untouched.
+  var PDF_WINDOW_WIDTH = 1440;
 
   // The unbreakable units a page may not be cut through, as
   // {top, bottom} in CSS px relative to #pdf-capture. Each report
@@ -910,7 +915,10 @@
       slices = planPageSlices(collectBreakUnits(clone, pageHpx), rect.height, pageHpx);
     }
 
-    return window.html2canvas(el, { scale: 2, backgroundColor: bg, useCORS: true, onclone: measure }).then(function (canvas) {
+    return window.html2canvas(el, {
+      scale: 2, backgroundColor: bg, useCORS: true,
+      windowWidth: PDF_WINDOW_WIDTH, onclone: measure
+    }).then(function (canvas) {
       var s = canvas.width / rect.width; // canvas px per CSS px
       slices.forEach(function (slice, i) {
         var sy = Math.round(slice[0] * s);
