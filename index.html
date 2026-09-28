@@ -1,0 +1,883 @@
+<title>Mental Performance Profile</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #F6F4EF;
+    --surface: #FFFFFF;
+    --surface-2: #EFF1EE;
+    --text: #20242A;
+    --text-muted: #5B6068;
+    --accent: #9C6E1F;
+    --accent-ink: #7A5518;
+    --accent-2: #1F5C57;
+    --accent-2-light: #2E7A73;
+    --caution: #93412F;
+    --border: #E0DDD3;
+    --track: #E7E3D8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171A1F;
+      --surface: #20242A;
+      --surface-2: #2B313A;
+      --text: #F4F3EF;
+      --text-muted: #B9C2C6;
+      --accent: #D9A24B;
+      --accent-ink: #E8BC72;
+      --accent-2: #5FBFB8;
+      --accent-2-light: #86D2CC;
+      --caution: #E09B87;
+      --border: #3A414A;
+      --track: #333941;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171A1F;
+    --surface: #20242A;
+    --surface-2: #2B313A;
+    --text: #F4F3EF;
+    --text-muted: #B9C2C6;
+    --accent: #D9A24B;
+    --accent-ink: #E8BC72;
+    --accent-2: #5FBFB8;
+    --accent-2-light: #86D2CC;
+    --caution: #E09B87;
+    --border: #3A414A;
+    --track: #333941;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    padding: 0 16px;
+  }
+  h1, h2, h3, .display {
+    font-family: "Fraunces", Georgia, serif;
+    text-wrap: balance;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 64px; }
+  .eyebrow {
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 8px;
+  }
+  .subtle { color: var(--text-muted); }
+  a { color: var(--accent-2); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+
+  button {
+    font-family: "Public Sans", sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+  button:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--text); color: var(--bg);
+    padding: 13px 26px; font-size: 15px; border: none;
+  }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent; color: var(--text); border: 1px solid var(--border);
+    padding: 11px 22px; font-size: 14px;
+  }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  /* ---- Intro ---- */
+  .brandbar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+  .brandmark { font-family: "Fraunces", serif; font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+  .brandmark span { color: var(--accent); }
+  .hero-title { font-size: clamp(28px, 6vw, 38px); margin: 0 0 10px; line-height: 1.08; }
+  .lede { font-size: 16.5px; line-height: 1.55; color: var(--text-muted); max-width: 58ch; }
+  .meta-row { display: flex; gap: 22px; flex-wrap: wrap; margin: 22px 0 26px; font-size: 13.5px; }
+  .meta-row div b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; margin-bottom: 3px; }
+  .foot-note { font-size: 12.5px; line-height: 1.6; color: var(--text-muted); margin-top: 28px; }
+
+  /* ---- Progress ---- */
+  .progress-shell {
+    position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg);
+    padding-top: 14px; padding-bottom: 10px; z-index: 5;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 7px; }
+
+  /* ---- Question groups ---- */
+  .part-title { margin: 30px 0 4px; }
+  .scale-legend {
+    display: flex; justify-content: space-between; gap: 4px; font-size: 10.5px; color: var(--text-muted);
+    padding: 0 2px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .scale-legend span { flex: 1; text-align: center; }
+  .scale-legend span:first-child { text-align: left; }
+  .scale-legend span:last-child { text-align: right; }
+  .scale-legend-sticky {
+    margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+    font-weight: 700; color: var(--text);
+  }
+
+  fieldset.item {
+    border: none; margin: 0; padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  fieldset.item:last-child { border-bottom: none; }
+  fieldset.item legend { font-size: 15px; line-height: 1.42; padding: 0 0 12px; float: left; width: 100%; }
+  .item-num { color: var(--accent); font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
+  .scale-row { display: flex; gap: 6px; clear: both; }
+  .scale-row label {
+    flex: 1; text-align: center; padding: 9px 2px; border-radius: 9px; border: 1px solid var(--border);
+    font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;
+    background: var(--surface-2); transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  }
+  .scale-row input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+  .scale-row input:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .scale-row input:focus-visible + label { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  fieldset.item.unanswered { outline: 1.5px dashed var(--caution); outline-offset: 8px; border-radius: 8px; }
+
+  .warn-banner {
+    display: none; background: var(--surface-2); border: 1px solid var(--caution); color: var(--text);
+    border-radius: 10px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 16px;
+  }
+  .warn-banner.show { display: block; }
+
+  /* ---- Report ---- */
+  .report-hero { text-align: left; margin-bottom: 22px; }
+  .domain-heading { display: flex; align-items: center; gap: 10px; margin: 34px 0 14px; }
+  .domain-heading h2 { margin: 0; font-size: 20px; }
+  .domain-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .bar-row { display: grid; grid-template-columns: 128px 1fr 34px; gap: 10px; align-items: center; padding: 8px 0; }
+  .bar-name { font-size: 13.5px; font-weight: 600; }
+  .bar-track { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; }
+  .bar-score { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--text-muted); text-align: right; }
+
+  .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  @media (max-width: 520px) { .callout-grid { grid-template-columns: 1fr; } }
+  .callout { border-radius: 12px; padding: 16px 18px; background: var(--surface-2); }
+  .callout h3 { margin: 0 0 8px; font-size: 14px; }
+  .callout ul { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
+
+  .gap-note { border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 8px 0; font-size: 13.5px; background: var(--surface-2); border-radius: 0 8px 8px 0; }
+
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+  table.data-table th, table.data-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  table.data-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.04em; }
+  .table-wrap { overflow-x: auto; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+  [hidden] { display: none !important; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(12px);
+    background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 20;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+
+<div class="wrap">
+  <div class="brandbar">
+    <div class="brandmark">PLAYMAKER <span>SPORTS</span></div>
+    <div class="subtle" style="font-size:12.5px;">Mental Performance Coaching · Confidential</div>
+  </div>
+
+  <!-- ============ SCREEN 1: INTRO ============ -->
+  <section id="screen-intro" class="screen active">
+    <p class="eyebrow">Phase 1 · Baseline Assessment</p>
+    <h1 class="hero-title">Your Mental Performance Profile</h1>
+    <p class="lede">This is the Test of Performance Strategies (TOPS&#8209;2), a published, validated sport-psychology questionnaire. It measures how often you already use skills such as goal-setting, self-talk, imagery, and relaxation, in training and in competition, giving us a specific baseline to build the rest of the work from.</p>
+
+    <div class="meta-row">
+      <div><b>Length</b>64 statements, ~12&ndash;15 min</div>
+      <div><b>Format</b>Two parts: Training, then Competition</div>
+      <div><b>Scale</b>1 Never &rarr; 5 Always</div>
+    </div>
+
+    <div class="card stack">
+      <div>
+        <strong>Before you start</strong>
+        <p class="subtle" style="font-size:14px; line-height:1.55; margin:8px 0 0;">There are no right or wrong answers here, only honest ones. Answer based on how you actually train and compete right now, not how you wish you did. Go with your first instinct rather than overthinking any one item.</p>
+      </div>
+      <div>
+        <strong>What happens to your answers</strong>
+        <p class="subtle" style="font-size:14px; line-height:1.55; margin:8px 0 0;">Your report is generated right here in your browser once you finish, and a copy is sent to your coach automatically. You'll also get your own copy on screen, with the option to download it as a PDF.</p>
+      </div>
+      <div>
+        <label for="input-name" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Your name</label>
+        <input type="text" id="input-name" placeholder="So your coach knows whose results these are" style="width:100%; padding:11px 14px; border-radius:9px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:14.5px; font-family:inherit;">
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:24px;">
+      <button class="btn-primary" id="btn-start">Begin Assessment</button>
+    </div>
+    <p class="subtle" id="name-warning" style="font-size:12.5px; margin-top:8px; display:none;">Add your name above first, so your coach knows whose report this is.</p>
+
+    <p class="foot-note">Adapted from the Test of Performance Strategies (Thomas, Murphy &amp; Hardy, 1999) and its 2010 factor-refined version, TOPS&#8209;2 (Hardy, Roberts, Thomas &amp; Murphy, <em>Psychology of Sport and Exercise</em>). Used here for individual coaching purposes only. This is a coaching tool, not a clinical or diagnostic instrument.</p>
+  </div>
+
+  <!-- ============ SCREEN 2: QUESTIONNAIRE ============ -->
+  <section id="screen-form" class="screen">
+    <div class="progress-shell">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label"><span id="progress-text">0 of 64 answered</span><span id="progress-part">Part 1 of 2 &middot; Training</span></div>
+      <div class="scale-legend scale-legend-sticky"><span>Never</span><span>Rarely</span><span>Sometimes</span><span>Often</span><span>Always</span></div>
+    </div>
+
+    <div id="warn-banner" class="warn-banner">A few statements below are still unanswered. They're outlined below. You can go back to them, or continue and finish them later; unanswered items just won't count toward that subscale's score.</div>
+
+    <div id="part-practice">
+      <h2 class="part-title">Part 1 &middot; Training &amp; Practice</h2>
+      <p class="subtle" style="font-size:14px;">Think about how you typically train, day to day, not one specific session.</p>
+      <div id="items-practice"></div>
+    </div>
+
+    <div id="part-competition" hidden>
+      <h2 class="part-title">Part 2 &middot; Competition</h2>
+      <p class="subtle" style="font-size:14px;">Now think about how you typically feel and act during actual matches.</p>
+      <div id="items-competition"></div>
+    </div>
+
+    <div class="btn-row" style="margin-top:26px;">
+      <button class="btn-ghost" id="btn-back-intro" hidden>Back</button>
+      <button class="btn-primary" id="btn-next-part">Continue to Part 2 &rarr;</button>
+      <button class="btn-primary" id="btn-submit" hidden>See My Report &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3: REPORT ============ -->
+  <section id="screen-report" class="screen">
+    <div id="pdf-capture">
+      <p class="eyebrow">Your Results</p>
+      <h1 class="hero-title report-hero">Mental Performance Profile</h1>
+      <p class="lede" id="report-summary" style="max-width:64ch;"></p>
+
+      <div class="callout-grid">
+        <div class="callout">
+          <h3 style="color:var(--accent-2);">Already Strong</h3>
+          <ul id="list-strengths"></ul>
+        </div>
+        <div class="callout">
+          <h3 style="color:var(--accent-ink, var(--accent));">Biggest Opportunities</h3>
+          <ul id="list-growth"></ul>
+        </div>
+      </div>
+
+      <div id="gap-notes"></div>
+
+      <div class="domain-heading"><span class="domain-dot" style="background:var(--accent-2);"></span><h2>Training</h2></div>
+      <div id="bars-practice"></div>
+
+      <div class="domain-heading"><span class="domain-dot" style="background:var(--accent);"></span><h2>Competition</h2></div>
+      <div id="bars-competition"></div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="full-table">
+          <thead><tr><th>Subscale</th><th>Training</th><th>Competition</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <p class="foot-note">Subscale scores are the mean of 4 items on TOPS&#8209;2's 1&ndash;5 frequency scale, with negatively-worded items reverse-scored so higher always reads as "more of this strategy." Negative Thinking is the one exception: there, a higher score means more frequent negative thinking during competition, so lower is the better outcome. These are self-report frequencies, not a diagnosis. They're a starting map for where our sessions get the most leverage. Source: Hardy, L., Roberts, R., Thomas, P. R., &amp; Murphy, S. M. (2010). Test of Performance Strategies (TOPS): Instrument refinement using confirmatory factor analysis. <em>Psychology of Sport and Exercise</em>, 11(1), 27&ndash;35; building on Thomas, Murphy &amp; Hardy (1999).</p>
+    </div>
+
+    <div class="btn-row" style="margin-top:28px;">
+      <button class="btn-primary" id="btn-pdf">Download PDF</button>
+      <button class="btn-ghost" id="btn-share" hidden>Send to Coach</button>
+      <button class="btn-ghost" id="btn-restart">Start Over</button>
+    </div>
+    <p class="subtle" id="email-fallback" style="font-size:12.5px; margin-top:10px;">A copy was already sent to your coach automatically. If you'd like to send it yourself too, email the downloaded PDF to <a href="mailto:kspradham.playmaker@gmail.com?subject=My%20Mental%20Performance%20Profile%20(TOPS-2)&amp;body=Hi%20KSP%2C%0A%0AAttaching%20my%20TOPS-2%20report%20(please%20attach%20the%20PDF%20you%20just%20downloaded).%0A%0A">kspradham.playmaker@gmail.com</a>.</p>
+    <p class="subtle" id="pdf-status" style="font-size:12.5px; margin-top:6px;"></p>
+  </section>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // CONFIG. Paste the deployed Google Apps Script Web App URL here
+  // (see apps-script/Code.gs and the README for setup steps). Leave
+  // as-is and the automatic email simply won't fire; the on-screen
+  // report, PDF download, and Send to Coach button all still work.
+  // ---------------------------------------------------------------
+  var EMAIL_ENDPOINT = "https://script.google.com/macros/s/AKfycbwXVPK0J9hOeR7ru1ZKagN4HVp2K9JZMGy_tRc23taNj9FV5P60jUdk3E7W9uLiM3Si/exec";
+  var COACH_EMAIL = "kspradham.playmaker@gmail.com";
+
+  // ---------------------------------------------------------------
+  // Item bank. Each subscale is 4 items. `rev:true` items are reverse
+  // scored (score = 6 - raw) before averaging, so every subscale reads
+  // in one consistent direction (higher = more of that strategy) --
+  // except Negative Thinking, which is intentionally kept in its own
+  // "higher = more negative thinking" direction.
+  // ---------------------------------------------------------------
+  var SUBSCALES = {
+    st: "Self-Talk", ec: "Emotional Control", au: "Automaticity", gs: "Goal-Setting",
+    im: "Imagery", ac: "Activation", rl: "Relaxation",
+    at: "Attentional Control", nt: "Negative Thinking"
+  };
+
+  var bank = {
+    practice: {
+      st: [
+        { t: "I motivate myself to train through positive self-talk.", rev: false },
+        { t: "I talk positively to myself to get the most out of practice.", rev: false },
+        { t: "I manage my self-talk effectively during practice.", rev: false },
+        { t: "I say things to myself to help my practice performance.", rev: false }
+      ],
+      ec: [
+        { t: "I have trouble controlling my emotions when things are not going well at practice.", rev: true },
+        { t: "When something upsets me during practice, my performance suffers.", rev: true },
+        { t: "My emotions keep me from performing my best at practice.", rev: true },
+        { t: "I get frustrated and emotionally upset when practice does not go well.", rev: true }
+      ],
+      au: [
+        { t: "I am able to perform skills at practice without consciously thinking about them.", rev: false },
+        { t: "I perform automatically at practice without having to consciously control each movement.", rev: false },
+        { t: "At practice, I allow the whole skill or movement to happen naturally without concentrating on each part.", rev: false },
+        { t: "I have to monitor all the details of each move to successfully execute skills at practice.", rev: true }
+      ],
+      gs: [
+        { t: "I have very specific goals for practice.", rev: false },
+        { t: "I set goals to help me use practice time effectively.", rev: false },
+        { t: "I set realistic but challenging goals for myself.", rev: false },
+        { t: "I don't set goals for practice. I just go out and do it.", rev: true }
+      ],
+      im: [
+        { t: "When I visualize my performance, I imagine what it will feel like.", rev: false },
+        { t: "When I visualize my performance, I imagine watching myself as if on a video replay.", rev: false },
+        { t: "I rehearse my performance in my mind before practice.", rev: false },
+        { t: "During practice I visualize successful past performances.", rev: false }
+      ],
+      ac: [
+        { t: "I can get my intensity levels just right at practice.", rev: false },
+        { t: "I can get myself 'up' at practice if I feel flat.", rev: false },
+        { t: "I do what needs to be done to get psyched up for practice.", rev: false },
+        { t: "I have difficulty getting into an ideal performance state at practice.", rev: true }
+      ],
+      rl: [
+        { t: "I use relaxation techniques to improve my performance at practice.", rev: false },
+        { t: "I use practice time to work on my relaxation techniques.", rev: false },
+        { t: "I practice using relaxation techniques at workouts.", rev: false },
+        { t: "I use workouts to practice relaxing.", rev: false }
+      ],
+      at: [
+        { t: "I am able to control distracting thoughts while I am training.", rev: false },
+        { t: "During practice I focus my attention effectively.", rev: false },
+        { t: "I have trouble maintaining my concentration during long practices.", rev: true },
+        { t: "My attention wanders while I am training.", rev: true }
+      ]
+    },
+    competition: {
+      st: [
+        { t: "I talk positively to myself to get the most out of competitions.", rev: false },
+        { t: "I manage my self-talk effectively during competition.", rev: false },
+        { t: "I say things to myself to help my competitive performance.", rev: false },
+        { t: "I have specific cue words or phrases I say to myself to help my performance during competition.", rev: false }
+      ],
+      ec: [
+        { t: "My emotions get out of control under the pressure of competition.", rev: true },
+        { t: "I have difficulty controlling my emotions at competitions.", rev: true },
+        { t: "I have difficulty controlling my emotions if I make a mistake in competition.", rev: true },
+        { t: "My emotions keep me from performing my best at competitions.", rev: true }
+      ],
+      au: [
+        { t: "I am able to trust my body to perform skills at competition.", rev: false },
+        { t: "I feel sufficiently prepared to perform on 'automatic pilot' at competition.", rev: false },
+        { t: "At competition, I allow the whole skill or movement to happen naturally without concentrating on each part.", rev: false },
+        { t: "I am unable to perform skills at competition without consciously thinking about them.", rev: true }
+      ],
+      gs: [
+        { t: "I set personal performance goals for competition.", rev: false },
+        { t: "I set very specific goals for competition.", rev: false },
+        { t: "I evaluate whether I achieve my competition goals.", rev: false },
+        { t: "I set specific result goals for competition.", rev: false }
+      ],
+      im: [
+        { t: "I rehearse my performance in my mind at competitions.", rev: false },
+        { t: "I imagine my competitive routine before I do it at a competition.", rev: false },
+        { t: "At competitions, I rehearse the feel of my performance in my imagination.", rev: false },
+        { t: "I visualize my competition going exactly the way I want it to go.", rev: false }
+      ],
+      ac: [
+        { t: "I can get myself 'up' at competition if I feel flat.", rev: false },
+        { t: "I psych myself up at competitions to get ready to perform.", rev: false },
+        { t: "I can get my intensity levels just right for competition.", rev: false },
+        { t: "I can raise my energy level at competitions when necessary.", rev: false }
+      ],
+      rl: [
+        { t: "I use relaxation techniques to improve my performance at competition.", rev: false },
+        { t: "I use relaxation strategies as a coping strategy at competition.", rev: false },
+        { t: "If I'm starting to lose my composure at competition, I use a relaxation technique.", rev: false },
+        { t: "When I need to, I can relax myself at competition to get ready to perform.", rev: false }
+      ],
+      nt: [
+        { t: "My self-talk during competition is negative.", rev: false },
+        { t: "During competition I have thoughts of failure.", rev: false },
+        { t: "I imagine screwing up during competition.", rev: false },
+        { t: "I keep my thoughts positive during competition.", rev: true }
+      ]
+    }
+  };
+
+  var PRACTICE_ORDER = ["st", "ec", "au", "gs", "im", "ac", "rl", "at"];
+  var COMPETITION_ORDER = ["st", "ec", "au", "gs", "im", "ac", "rl", "nt"];
+
+  // Flat, interleaved (round-robin across subscales) question list per domain.
+  function buildFlatList(domain, order) {
+    var list = [];
+    for (var round = 0; round < 4; round++) {
+      order.forEach(function (key) {
+        var item = bank[domain][key][round];
+        list.push({
+          id: domain[0] + "-" + key + "-" + (round + 1),
+          domain: domain, sub: key, text: item.t, rev: item.rev
+        });
+      });
+    }
+    return list;
+  }
+
+  var PRACTICE_ITEMS = buildFlatList("practice", PRACTICE_ORDER);
+  var COMPETITION_ITEMS = buildFlatList("competition", COMPETITION_ORDER);
+  var ALL_ITEMS = PRACTICE_ITEMS.concat(COMPETITION_ITEMS);
+
+  var answers = {}; // id -> 1..5
+
+  // ---------------------------------------------------------------
+  // Render questionnaire
+  // ---------------------------------------------------------------
+  function renderItems(container, items, offset) {
+    var html = "";
+    items.forEach(function (q, i) {
+      var num = offset + i + 1;
+      html += '<fieldset class="item" id="fs-' + q.id + '" data-id="' + q.id + '">';
+      html += '<legend><span class="item-num">' + num + '.</span>' + q.text + '</legend>';
+      html += '<div class="scale-row">';
+      for (var v = 1; v <= 5; v++) {
+        var inputId = "in-" + q.id + "-" + v;
+        html += '<input type="radio" name="q-' + q.id + '" id="' + inputId + '" value="' + v + '">';
+        html += '<label for="' + inputId + '">' + v + '</label>';
+      }
+      html += '</div></fieldset>';
+    });
+    container.innerHTML = html;
+  }
+
+  var elPractice = document.getElementById("items-practice");
+  var elCompetition = document.getElementById("items-competition");
+  renderItems(elPractice, PRACTICE_ITEMS, 0);
+  renderItems(elCompetition, COMPETITION_ITEMS, 32);
+
+  document.getElementById("screen-form").addEventListener("change", function (e) {
+    if (e.target && e.target.type === "radio") {
+      var fs = e.target.closest("fieldset.item");
+      var id = fs.getAttribute("data-id");
+      answers[id] = parseInt(e.target.value, 10);
+      fs.classList.remove("unanswered");
+      updateProgress();
+    }
+  });
+
+  function updateProgress() {
+    var answered = Object.keys(answers).length;
+    document.getElementById("progress-fill").style.width = Math.round((answered / 64) * 100) + "%";
+    document.getElementById("progress-text").textContent = answered + " of 64 answered";
+  }
+
+  function unansweredIn(items) {
+    return items.filter(function (q) { return !answers[q.id]; });
+  }
+
+  function markUnanswered(items) {
+    items.forEach(function (q) {
+      var fs = document.getElementById("fs-" + q.id);
+      if (fs) fs.classList.add("unanswered");
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Screen navigation
+  // ---------------------------------------------------------------
+  var screens = {
+    intro: document.getElementById("screen-intro"),
+    form: document.getElementById("screen-form"),
+    report: document.getElementById("screen-report")
+  };
+  function show(name) {
+    Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+
+  document.getElementById("btn-start").addEventListener("click", function () {
+    var nameInput = document.getElementById("input-name");
+    var name = nameInput.value.trim();
+    if (!name) {
+      document.getElementById("name-warning").style.display = "block";
+      nameInput.focus();
+      return;
+    }
+    window._respondentName = name;
+    show("form");
+    document.getElementById("btn-back-intro").hidden = false;
+  });
+
+  document.getElementById("btn-back-intro").addEventListener("click", function () {
+    var onPart2 = !document.getElementById("part-competition").hidden;
+    if (onPart2) {
+      document.getElementById("part-competition").hidden = true;
+      document.getElementById("part-practice").hidden = false;
+      document.getElementById("btn-next-part").hidden = false;
+      document.getElementById("btn-submit").hidden = true;
+      document.getElementById("progress-part").textContent = "Part 1 of 2 · Training";
+    } else {
+      show("intro");
+    }
+  });
+
+  document.getElementById("btn-next-part").addEventListener("click", function () {
+    var missing = unansweredIn(PRACTICE_ITEMS);
+    var banner = document.getElementById("warn-banner");
+    if (missing.length) {
+      markUnanswered(missing);
+      banner.textContent = missing.length + " item" + (missing.length === 1 ? "" : "s") + " in Part 1 still unanswered, outlined below. You can fill them in, or continue and they just won't count toward that subscale.";
+      banner.classList.add("show");
+    } else {
+      banner.classList.remove("show");
+    }
+    document.getElementById("part-practice").hidden = true;
+    document.getElementById("part-competition").hidden = false;
+    document.getElementById("btn-next-part").hidden = true;
+    document.getElementById("btn-submit").hidden = false;
+    document.getElementById("progress-part").textContent = "Part 2 of 2 · Competition";
+    window.scrollTo({ top: 0 });
+  });
+
+  document.getElementById("btn-submit").addEventListener("click", function () {
+    var missing = unansweredIn(COMPETITION_ITEMS);
+    var banner = document.getElementById("warn-banner");
+    if (missing.length) {
+      markUnanswered(missing);
+      banner.textContent = missing.length + " item" + (missing.length === 1 ? "" : "s") + " in Part 2 still unanswered, outlined below. You can fill them in, or generate the report now and they just won't count toward that subscale.";
+      banner.classList.add("show");
+      var first = document.getElementById("fs-" + missing[0].id);
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    generateReport();
+    show("report");
+  });
+
+  document.getElementById("btn-restart").addEventListener("click", function () {
+    answers = {};
+    document.querySelectorAll('#screen-form input[type="radio"]').forEach(function (r) { r.checked = false; });
+    document.querySelectorAll("fieldset.item").forEach(function (fs) { fs.classList.remove("unanswered"); });
+    document.getElementById("warn-banner").classList.remove("show");
+    document.getElementById("part-practice").hidden = false;
+    document.getElementById("part-competition").hidden = true;
+    document.getElementById("btn-next-part").hidden = false;
+    document.getElementById("btn-submit").hidden = true;
+    document.getElementById("progress-part").textContent = "Part 1 of 2 · Training";
+    updateProgress();
+    show("intro");
+  });
+
+  // ---------------------------------------------------------------
+  // Scoring
+  // ---------------------------------------------------------------
+  function scoreSubscale(domain, key) {
+    var items = bank[domain][key];
+    var order = domain === "practice" ? PRACTICE_ORDER : COMPETITION_ORDER;
+    var sum = 0, n = 0;
+    items.forEach(function (item, i) {
+      var id = domain[0] + "-" + key + "-" + (i + 1);
+      var raw = answers[id];
+      if (!raw) return;
+      var v = item.rev ? (6 - raw) : raw;
+      sum += v; n++;
+    });
+    return n ? (sum / n) : null;
+  }
+
+  function bandLabel(score) {
+    if (score === null) return "Not enough data";
+    if (score >= 4.0) return "High";
+    if (score >= 3.0) return "Moderate-high";
+    if (score >= 2.0) return "Moderate-low";
+    return "Low";
+  }
+
+  function generateReport() {
+    var results = { practice: {}, competition: {} };
+    PRACTICE_ORDER.forEach(function (k) { results.practice[k] = scoreSubscale("practice", k); });
+    COMPETITION_ORDER.forEach(function (k) { results.competition[k] = scoreSubscale("competition", k); });
+
+    // Rank list for strengths/growth: use "coaching value" where higher is
+    // always better (Negative Thinking inverted just for this ranking).
+    var ranked = [];
+    ["practice", "competition"].forEach(function (domain) {
+      var order = domain === "practice" ? PRACTICE_ORDER : COMPETITION_ORDER;
+      order.forEach(function (key) {
+        var raw = results[domain][key];
+        if (raw === null) return;
+        var value = key === "nt" ? (6 - raw) : raw;
+        ranked.push({ domain: domain, key: key, raw: raw, value: value });
+      });
+    });
+    ranked.sort(function (a, b) { return b.value - a.value; });
+
+    var strengths = ranked.slice(0, 3);
+    var growth = ranked.slice(-3).reverse();
+
+    var domainLabel = { practice: "Training", competition: "Competition" };
+    function itemLine(r) {
+      var name = SUBSCALES[r.key] + (r.key === "nt" ? "" : "");
+      return name + " <span class=\"subtle\">(" + domainLabel[r.domain] + (r.key === "nt" ? ", inverted for ranking" : "") + ")</span>";
+    }
+
+    document.getElementById("list-strengths").innerHTML = strengths.map(function (r) {
+      return "<li>" + itemLine(r) + "</li>";
+    }).join("");
+    document.getElementById("list-growth").innerHTML = growth.map(function (r) {
+      return "<li>" + itemLine(r) + "</li>";
+    }).join("");
+
+    var answeredCount = Object.keys(answers).length;
+    document.getElementById("report-summary").textContent =
+      "Based on " + answeredCount + " of 64 statements. Scores run 1–5; for every subscale except Negative Thinking, higher means you already use that strategy more often. Use this as a map of where our sessions can add the most, not a verdict.";
+
+    // Bars
+    function renderBars(container, domain, order) {
+      var html = "";
+      order.forEach(function (key) {
+        var score = results[domain][key];
+        var pct = score === null ? 0 : ((score - 1) / 4) * 100;
+        var color = domain === "practice" ? "var(--accent-2)" : "var(--accent)";
+        if (key === "nt") color = "var(--caution)";
+        html += '<div class="bar-row">';
+        html += '<div class="bar-name">' + SUBSCALES[key] + '</div>';
+        html += '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%; background:' + color + ';"></div></div>';
+        html += '<div class="bar-score">' + (score === null ? "—" : score.toFixed(1)) + '</div>';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+    renderBars(document.getElementById("bars-practice"), "practice", PRACTICE_ORDER);
+    renderBars(document.getElementById("bars-competition"), "competition", COMPETITION_ORDER);
+
+    // Practice vs competition gap notes, for the 7 shared subscales
+    var shared = ["st", "ec", "au", "gs", "im", "ac", "rl"];
+    var gapHtml = "";
+    shared.forEach(function (key) {
+      var p = results.practice[key], c = results.competition[key];
+      if (p === null || c === null) return;
+      var gap = p - c;
+      if (Math.abs(gap) >= 1.0) {
+        var higher = gap > 0 ? "training" : "competition";
+        var lower = gap > 0 ? "competition" : "training";
+        gapHtml += '<div class="gap-note"><strong>' + SUBSCALES[key] + ':</strong> noticeably stronger in ' + higher + ' (' + (gap > 0 ? p : c).toFixed(1) + ') than in ' + lower + ' (' + (gap > 0 ? c : p).toFixed(1) + '). Worth carrying the ' + higher + ' version of this skill into ' + lower + '.</div>';
+      }
+    });
+    document.getElementById("gap-notes").innerHTML = gapHtml;
+
+    // Full table
+    var rows = "";
+    shared.forEach(function (key) {
+      var p = results.practice[key], c = results.competition[key];
+      rows += "<tr><td>" + SUBSCALES[key] + "</td><td>" + (p === null ? "—" : p.toFixed(1) + " · " + bandLabel(p)) + "</td><td>" + (c === null ? "—" : c.toFixed(1) + " · " + bandLabel(c)) + "</td></tr>";
+    });
+    rows += "<tr><td>Attentional Control</td><td>" + (results.practice.at === null ? "—" : results.practice.at.toFixed(1) + " · " + bandLabel(results.practice.at)) + "</td><td class=\"subtle\">n/a in competition</td></tr>";
+    rows += "<tr><td>Negative Thinking</td><td class=\"subtle\">n/a in training</td><td>" + (results.competition.nt === null ? "—" : results.competition.nt.toFixed(1) + " · higher = more negative thinking") + "</td></tr>";
+    document.querySelector("#full-table tbody").innerHTML = rows;
+
+    window._lastReportText = buildReportText(results, strengths, growth, answeredCount);
+    sendToCoach(results, strengths, growth, answeredCount);
+  }
+
+  function buildReportText(results, strengths, growth, answeredCount) {
+    var lines = [];
+    lines.push("MENTAL PERFORMANCE PROFILE (TOPS-2)");
+    lines.push("Respondent: " + (window._respondentName || "(not given)"));
+    lines.push("Based on " + answeredCount + " of 64 statements. Scale: 1 Never → 5 Always.");
+    lines.push("");
+    lines.push("TRAINING");
+    PRACTICE_ORDER.forEach(function (key) {
+      var s = results.practice[key];
+      lines.push("  " + SUBSCALES[key] + ": " + (s === null ? "n/a" : s.toFixed(1) + " (" + bandLabel(s) + ")"));
+    });
+    lines.push("");
+    lines.push("COMPETITION");
+    COMPETITION_ORDER.forEach(function (key) {
+      var s = results.competition[key];
+      var suffix = key === "nt" ? " (higher = more negative thinking)" : " (" + bandLabel(s) + ")";
+      lines.push("  " + SUBSCALES[key] + ": " + (s === null ? "n/a" : s.toFixed(1) + suffix));
+    });
+    lines.push("");
+    lines.push("ALREADY STRONG");
+    strengths.forEach(function (r) { lines.push("  - " + SUBSCALES[r.key] + " (" + (r.domain === "practice" ? "Training" : "Competition") + ")"); });
+    lines.push("");
+    lines.push("BIGGEST OPPORTUNITIES");
+    growth.forEach(function (r) { lines.push("  - " + SUBSCALES[r.key] + " (" + (r.domain === "practice" ? "Training" : "Competition") + ")"); });
+    lines.push("");
+    lines.push("Source: Test of Performance Strategies / TOPS-2 (Thomas, Murphy & Hardy, 1999; Hardy, Roberts, Thomas & Murphy, 2010). Coaching tool, not a clinical instrument.");
+    return lines.join("\n");
+  }
+
+  // ---------------------------------------------------------------
+  // Automatic email to the coach on submit, via a Google Apps Script
+  // Web App (see apps-script/Code.gs). Fire-and-forget: this never
+  // blocks or interrupts the respondent's own on-screen report, and
+  // a failed or unconfigured endpoint fails silently here since the
+  // download and Send to Coach options below are the guaranteed path.
+  // Apps Script Web Apps don't return CORS headers, so this uses the
+  // standard no-cors workaround and can't confirm delivery from the
+  // browser; the Apps Script side is still the source of truth.
+  // ---------------------------------------------------------------
+  function sendToCoach(results, strengths, growth, answeredCount) {
+    if (!EMAIL_ENDPOINT || EMAIL_ENDPOINT.indexOf("PASTE_YOUR") === 0) return;
+    var payload = {
+      name: window._respondentName || "(not given)",
+      answeredCount: answeredCount,
+      practice: results.practice,
+      competition: results.competition,
+      strengths: strengths.map(function (r) { return { subscale: SUBSCALES[r.key], domain: r.domain }; }),
+      growth: growth.map(function (r) { return { subscale: SUBSCALES[r.key], domain: r.domain }; }),
+      reportText: window._lastReportText || ""
+    };
+    try {
+      fetch(EMAIL_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      }).catch(function () { /* best-effort only */ });
+    } catch (e) { /* fetch unsupported or blocked; PDF/share options still work */ }
+  }
+
+  // ---------------------------------------------------------------
+  // PDF generation (matches the on-screen report exactly) + delivery
+  // ---------------------------------------------------------------
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 2800);
+  }
+
+  function setStatus(msg) {
+    document.getElementById("pdf-status").textContent = msg || "";
+  }
+
+  var cachedPdfBlob = null;
+  var cachedPdfKey = null;
+
+  // Renders #pdf-capture to a PDF (one or more pages, sliced to fit)
+  // and caches the blob keyed to the current report so repeat clicks
+  // (Download, then Send to Coach) don't re-render from scratch.
+  function getPdfBlob() {
+    var key = window._lastReportText || "";
+    if (cachedPdfBlob && cachedPdfKey === key) return Promise.resolve(cachedPdfBlob);
+    if (!window.html2canvas || !window.jspdf) {
+      return Promise.reject(new Error("PDF libraries did not load"));
+    }
+    var el = document.getElementById("pdf-capture");
+    var bg = getComputedStyle(document.body).backgroundColor;
+    return window.html2canvas(el, { scale: 2, backgroundColor: bg, useCORS: true }).then(function (canvas) {
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({ unit: "pt", format: "a4" });
+      var pageW = pdf.internal.pageSize.getWidth();
+      var pageH = pdf.internal.pageSize.getHeight();
+      var imgW = pageW;
+      var imgH = (canvas.height * imgW) / canvas.width;
+      var imgData = canvas.toDataURL("image/png");
+      var heightLeft = imgH;
+      var position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) {
+        position -= pageH;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
+        heightLeft -= pageH;
+      }
+      var blob = pdf.output("blob");
+      cachedPdfBlob = blob;
+      cachedPdfKey = key;
+      return blob;
+    });
+  }
+
+  function downloadBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
+  document.getElementById("btn-pdf").addEventListener("click", function () {
+    var btn = this;
+    btn.disabled = true;
+    setStatus("Preparing PDF…");
+    getPdfBlob().then(function (blob) {
+      downloadBlob(blob, "mental-performance-profile.pdf");
+      setStatus("Saved as PDF.");
+    }).catch(function () {
+      setStatus("Couldn't generate the PDF. Try reloading the page.");
+    }).finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById("btn-share").addEventListener("click", function () {
+    var btn = this;
+    btn.disabled = true;
+    setStatus("Preparing PDF…");
+    getPdfBlob().then(function (blob) {
+      var file = new File([blob], "mental-performance-profile.pdf", { type: "application/pdf" });
+      return navigator.share({
+        files: [file],
+        title: "Mental Performance Profile",
+        text: "My TOPS-2 results, for KSP (kspradham.playmaker@gmail.com)."
+      });
+    }).then(function () {
+      setStatus("Shared.");
+    }).catch(function (err) {
+      if (err && err.name === "AbortError") { setStatus(""); return; }
+      setStatus("Couldn't open the share sheet. Use Download PDF and email it instead.");
+    }).finally(function () { btn.disabled = false; });
+  });
+
+  // Feature-detect the Web Share API (file sharing) for the "Send to
+  // Coach" one-tap button; the plain mailto fallback is always visible.
+  (function () {
+    try {
+      var testFile = new File(["x"], "x.pdf", { type: "application/pdf" });
+      if (navigator.canShare && navigator.canShare({ files: [testFile] })) {
+        document.getElementById("btn-share").hidden = false;
+      }
+    } catch (e) { /* Web Share unsupported; mailto fallback covers it */ }
+  })();
+})();
+</script>
