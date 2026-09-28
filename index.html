@@ -156,27 +156,40 @@
   .warn-banner.show { display: block; }
 
   /* ---- Report ---- */
-  .report-hero { text-align: left; margin-bottom: 22px; }
-  .domain-heading { display: flex; align-items: center; gap: 10px; margin: 34px 0 14px; }
+  /* Spacing scale: 40px between report sections, 16px within a section,
+     24px card padding. Sections are spaced with flex gap only (no
+     margins), so nothing collapses or stacks unpredictably. */
+  .wrap.is-report { max-width: 900px; }
+  @media (min-width: 768px) { .wrap.is-report { padding-inline: 32px; } }
+  #pdf-capture { display: flex; flex-direction: column; gap: 40px; }
+  .report-section { display: flex; flex-direction: column; gap: 16px; }
+  .report-section > * { margin: 0; }
+  .report-header .eyebrow { margin-bottom: -8px; }
+  .report-hero { text-align: left; }
+  #pdf-capture .foot-note { margin: 0; }
+  #gap-notes:empty { display: none; }
+
+  .domain-heading { display: flex; align-items: center; gap: 10px; }
   .domain-heading h2 { margin: 0; font-size: 20px; }
   .domain-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .bar-row { display: grid; grid-template-columns: 128px 1fr 34px; gap: 10px; align-items: center; padding: 8px 0; }
+  .bar-row { display: grid; grid-template-columns: 128px 1fr 34px; gap: 10px; align-items: center; }
   .bar-name { font-size: 13.5px; font-weight: 600; }
   .bar-track { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 999px; }
   .bar-score { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--text-muted); text-align: right; }
 
-  .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 520px) { .callout-grid { grid-template-columns: 1fr; } }
-  .callout { border-radius: 12px; padding: 16px 18px; background: var(--surface-2); }
+  .callout { border-radius: 12px; padding: 24px; background: var(--surface-2); }
   .callout h3 { margin: 0 0 8px; font-size: 14px; }
   .callout ul { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
 
-  .gap-note { border-left: 3px solid var(--accent-2); padding: 10px 14px; margin: 8px 0; font-size: 13.5px; background: var(--surface-2); border-radius: 0 8px 8px 0; }
+  .gap-note { border-left: 3px solid var(--accent-2); padding: 24px; font-size: 13.5px; line-height: 1.55; background: var(--surface-2); border-radius: 0 8px 8px 0; }
 
-  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
-  table.data-table th, table.data-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data-table th, table.data-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); }
   table.data-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.04em; }
+  table.data-table tbody tr:nth-child(even) td { background: var(--surface-2); }
   .table-wrap { overflow-x: auto; }
 
   .screen { display: none; }
@@ -230,7 +243,7 @@
     <p class="subtle" id="name-warning" style="font-size:12.5px; margin-top:8px; display:none;">Add your name above first, so your coach knows whose report this is.</p>
 
     <p class="foot-note">Adapted from the Test of Performance Strategies (Thomas, Murphy &amp; Hardy, 1999) and its 2010 factor-refined version, TOPS&#8209;2 (Hardy, Roberts, Thomas &amp; Murphy, <em>Psychology of Sport and Exercise</em>). Used here for individual coaching purposes only. This is a coaching tool, not a clinical or diagnostic instrument.</p>
-  </div>
+  </section>
 
   <!-- ============ SCREEN 2: QUESTIONNAIRE ============ -->
   <section id="screen-form" class="screen">
@@ -263,10 +276,14 @@
 
   <!-- ============ SCREEN 3: REPORT ============ -->
   <section id="screen-report" class="screen">
+    <!-- Each direct child of #pdf-capture is one report section; the PDF
+         paginator treats them (and each table row) as unbreakable units. -->
     <div id="pdf-capture">
-      <p class="eyebrow">Your Results</p>
-      <h1 class="hero-title report-hero">Mental Performance Profile</h1>
-      <p class="lede" id="report-summary" style="max-width:64ch;"></p>
+      <div class="report-section report-header">
+        <p class="eyebrow">Your Results</p>
+        <h1 class="hero-title report-hero">Mental Performance Profile</h1>
+        <p class="lede" id="report-summary" style="max-width:64ch;"></p>
+      </div>
 
       <div class="callout-grid">
         <div class="callout">
@@ -279,13 +296,17 @@
         </div>
       </div>
 
-      <div id="gap-notes"></div>
+      <div class="report-section" id="gap-notes"></div>
 
-      <div class="domain-heading"><span class="domain-dot" style="background:var(--accent-2);"></span><h2>Training</h2></div>
-      <div id="bars-practice"></div>
+      <div class="report-section">
+        <div class="domain-heading"><span class="domain-dot" style="background:var(--accent-2);"></span><h2>Training</h2></div>
+        <div class="report-section" id="bars-practice"></div>
+      </div>
 
-      <div class="domain-heading"><span class="domain-dot" style="background:var(--accent);"></span><h2>Competition</h2></div>
-      <div id="bars-competition"></div>
+      <div class="report-section">
+        <div class="domain-heading"><span class="domain-dot" style="background:var(--accent);"></span><h2>Competition</h2></div>
+        <div class="report-section" id="bars-competition"></div>
+      </div>
 
       <div class="table-wrap">
         <table class="data-table" id="full-table">
@@ -526,6 +547,7 @@
   };
   function show(name) {
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
+    document.querySelector(".wrap").classList.toggle("is-report", name === "report");
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   }
 
@@ -791,9 +813,73 @@
   var cachedPdfBlob = null;
   var cachedPdfKey = null;
 
-  // Renders #pdf-capture to a PDF (one or more pages, sliced to fit)
-  // and caches the blob keyed to the current report so repeat clicks
-  // (Download, then Send to Coach) don't re-render from scratch.
+  var PDF_MARGIN = 32; // pt, on all four sides of every page
+
+  // The unbreakable units a page may not be cut through, as
+  // {top, bottom} in CSS px relative to #pdf-capture. Each report
+  // section is one unit; a table contributes one unit per row (with the
+  // header row kept attached to the first body row); a section taller
+  // than a whole page is broken down into its children instead.
+  function collectBreakUnits(root, maxUnitH) {
+    var origin = root.getBoundingClientRect().top;
+    var units = [];
+    function add(el) {
+      var r = el.getBoundingClientRect();
+      if (r.height > 0) units.push({ top: r.top - origin, bottom: r.bottom - origin });
+    }
+    function visit(el) {
+      var table = el.tagName === "TABLE" ? el : el.querySelector(":scope > table");
+      if (table) {
+        var rows = table.querySelectorAll("tr");
+        for (var i = 0; i < rows.length; i++) {
+          var first = rows[i].getBoundingClientRect();
+          if (i === 0 && rows.length > 1) {
+            var second = rows[1].getBoundingClientRect();
+            units.push({ top: first.top - origin, bottom: second.bottom - origin });
+            i++;
+          } else {
+            add(rows[i]);
+          }
+        }
+        return;
+      }
+      if (el.getBoundingClientRect().height > maxUnitH && el.children.length) {
+        Array.prototype.forEach.call(el.children, visit);
+        return;
+      }
+      add(el);
+    }
+    Array.prototype.forEach.call(root.children, visit);
+    units.sort(function (a, b) { return a.top - b.top; });
+    return units;
+  }
+
+  // Walks the units top to bottom, ending each page right before the
+  // first unit that would cross its bottom edge. Only a single unit
+  // taller than a full page (rare; nothing in the report should be) is
+  // ever cut, since there is no clean place to break it.
+  function planPageSlices(units, totalH, pageH) {
+    var slices = [];
+    var start = 0;
+    units.forEach(function (u) {
+      if (u.bottom - start <= pageH) return;
+      if (u.top > start) {
+        slices.push([start, u.top]);
+        start = u.top;
+      }
+      while (u.bottom - start > pageH) {
+        slices.push([start, start + pageH]);
+        start += pageH;
+      }
+    });
+    if (totalH - start > 0.5) slices.push([start, totalH]);
+    return slices;
+  }
+
+  // Renders #pdf-capture to a PDF (one or more pages, broken only
+  // between sections or table rows) and caches the blob keyed to the
+  // current report so repeat clicks (Download, then Send to Coach)
+  // don't re-render from scratch.
   function getPdfBlob() {
     var key = window._lastReportText || "";
     if (cachedPdfBlob && cachedPdfKey === key) return Promise.resolve(cachedPdfBlob);
@@ -802,24 +888,49 @@
     }
     var el = document.getElementById("pdf-capture");
     var bg = getComputedStyle(document.body).backgroundColor;
-    return window.html2canvas(el, { scale: 2, backgroundColor: bg, useCORS: true }).then(function (canvas) {
-      var jsPDF = window.jspdf.jsPDF;
-      var pdf = new jsPDF({ unit: "pt", format: "a4" });
-      var pageW = pdf.internal.pageSize.getWidth();
-      var pageH = pdf.internal.pageSize.getHeight();
-      var imgW = pageW;
-      var imgH = (canvas.height * imgW) / canvas.width;
-      var imgData = canvas.toDataURL("image/png");
-      var heightLeft = imgH;
-      var position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-      heightLeft -= pageH;
-      while (heightLeft > 0) {
-        position -= pageH;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-        heightLeft -= pageH;
-      }
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ unit: "pt", format: "a4" });
+    var pageW = pdf.internal.pageSize.getWidth();
+    var pageH = pdf.internal.pageSize.getHeight();
+    var contentW = pageW - PDF_MARGIN * 2;
+    var contentH = pageH - PDF_MARGIN * 2;
+
+    var rgb = (bg.match(/\d+(\.\d+)?/g) || [255, 255, 255]).slice(0, 3).map(Number);
+
+    // Page breaks are measured inside html2canvas's cloned document, not
+    // the live one: the clone is what actually gets drawn, and its text
+    // can wrap slightly differently (e.g. no scrollbar), which would
+    // otherwise shift every break off its row.
+    var rect, ptPerPx, slices;
+    function measure(doc) {
+      var clone = doc.getElementById("pdf-capture");
+      rect = clone.getBoundingClientRect();
+      ptPerPx = contentW / rect.width;
+      var pageHpx = contentH / ptPerPx;
+      slices = planPageSlices(collectBreakUnits(clone, pageHpx), rect.height, pageHpx);
+    }
+
+    return window.html2canvas(el, { scale: 2, backgroundColor: bg, useCORS: true, onclone: measure }).then(function (canvas) {
+      var s = canvas.width / rect.width; // canvas px per CSS px
+      slices.forEach(function (slice, i) {
+        var sy = Math.round(slice[0] * s);
+        var sh = Math.min(canvas.height, Math.round(slice[1] * s)) - sy;
+        if (sh <= 0) return;
+        var page = document.createElement("canvas");
+        page.width = canvas.width;
+        page.height = sh;
+        var ctx = page.getContext("2d");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, page.width, page.height);
+        ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+
+        if (i > 0) pdf.addPage();
+        pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+        pdf.rect(0, 0, pageW, pageH, "F");
+        // JPEG, not PNG: jsPDF barely compresses PNG, which made a
+        // two-page report tens of MB; at 0.92 text stays crisp.
+        pdf.addImage(page.toDataURL("image/jpeg", 0.92), "JPEG", PDF_MARGIN, PDF_MARGIN, contentW, (sh / s) * ptPerPx);
+      });
       var blob = pdf.output("blob");
       cachedPdfBlob = blob;
       cachedPdfKey = key;
