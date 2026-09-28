@@ -3,7 +3,8 @@
  *
  * Deployed as a Google Apps Script Web App, this receives one POST per
  * completed assessment from the page's sendToCoach() function, emails the
- * coach a formatted summary, and logs the submission to a Google Sheet.
+ * coach the respondent's PDF report (attached) with a short text summary,
+ * and logs the submission to a Google Sheet.
  *
  * SETUP
  * 1. Go to script.google.com, create a new project, and paste this file's
@@ -59,8 +60,21 @@ function logToSheet(data) {
 function sendEmail(data) {
   var name = data.name || "(not given)";
   var subject = "TOPS-2 Mental Performance Profile (" + name + ")";
-  var body = data.reportText || "A new TOPS-2 assessment was completed, but no report text was attached.";
-  GmailApp.sendEmail(COACH_EMAIL, subject, body);
+  var summary = data.reportText || "A new TOPS-2 assessment was completed, but no report text was attached.";
+  var options = {};
+  var intro;
+  // The page sends the same PDF the respondent can download, base64-encoded.
+  // If it's missing (the browser couldn't build it), the text summary still goes out.
+  if (data.pdfBase64) {
+    var filename = data.pdfFilename || "mental-performance-profile.pdf";
+    options.attachments = [
+      Utilities.newBlob(Utilities.base64Decode(data.pdfBase64), "application/pdf", filename)
+    ];
+    intro = name + " completed the TOPS-2 assessment. Their full report is attached as a PDF; a text summary follows.";
+  } else {
+    intro = name + " completed the TOPS-2 assessment. (The PDF couldn't be generated in their browser, so only the text summary is included.)";
+  }
+  GmailApp.sendEmail(COACH_EMAIL, subject, intro + "\n\n" + summary, options);
 }
 
 /**

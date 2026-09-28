@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<!-- Without this, phones lay the page out at ~980px and shrink it to fit:
+     tiny text, a mostly blank screen, and a double-tap-zoom tap delay. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mental Performance Profile</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
@@ -49,11 +55,32 @@
     color-scheme: dark;
   }
 
+  /* Fluid type scale: the first value is the phone size, the last the
+     desktop size, scaling smoothly in between. */
+  :root {
+    --fs-body: clamp(15px, 14.4px + 0.2vw, 16px);
+    --fs-lede: clamp(16.5px, 15.8px + 0.25vw, 17.5px);
+    --fs-small: clamp(13.5px, 13.2px + 0.1vw, 14px);
+    --fs-foot: clamp(13px, 12.7px + 0.1vw, 13.5px);
+    --fs-label: clamp(11.5px, 11.2px + 0.1vw, 12px);
+    --fs-question: clamp(16px, 15.6px + 0.15vw, 16.5px);
+    --sticky-h: 0px; /* set from JS to the sticky progress header's height */
+  }
+
   * { box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Anything scrolled into view (focus, jumps to an unanswered item)
+       stops below the sticky progress header instead of under it. */
+    scroll-padding-top: calc(var(--sticky-h) + 12px);
+  }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+    font-size: var(--fs-body);
+    margin: 0;
     padding: 0 16px;
   }
   h1, h2, h3, .display {
@@ -64,7 +91,7 @@
   }
   .wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 64px; }
   .eyebrow {
-    font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--accent); margin: 0 0 8px;
   }
   .subtle { color: var(--text-muted); }
@@ -74,7 +101,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 22px;
+    padding: clamp(18px, 4.5vw, 22px);
   }
   .stack { display: flex; flex-direction: column; gap: 16px; }
 
@@ -89,34 +116,53 @@
   button:active { transform: scale(0.98); }
   .btn-primary {
     background: var(--text); color: var(--bg);
-    padding: 13px 26px; font-size: 15px; border: none;
+    padding: 14px 28px; font-size: 16px; border: none;
   }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn-ghost {
     background: transparent; color: var(--text); border: 1px solid var(--border);
-    padding: 11px 22px; font-size: 14px;
+    padding: 12px 22px; font-size: 15px;
   }
   .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  /* No double-tap-to-zoom wait on anything tappable. */
+  button, label, input { touch-action: manipulation; }
 
   /* ---- Intro ---- */
-  .brandbar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-  .brandmark { font-family: "Fraunces", serif; font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+  .brandbar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: clamp(22px, 4vw, 30px); flex-wrap: wrap; }
+  .brandmark { font-family: "Fraunces", serif; font-weight: 700; font-size: clamp(15px, 14.5px + 0.15vw, 16px); letter-spacing: 0.02em; }
   .brandmark span { color: var(--accent); }
-  .hero-title { font-size: clamp(28px, 6vw, 38px); margin: 0 0 10px; line-height: 1.08; }
-  .lede { font-size: 16.5px; line-height: 1.55; color: var(--text-muted); max-width: 58ch; }
-  .meta-row { display: flex; gap: 22px; flex-wrap: wrap; margin: 22px 0 26px; font-size: 13.5px; }
-  .meta-row div b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; margin-bottom: 3px; }
-  .foot-note { font-size: 12.5px; line-height: 1.6; color: var(--text-muted); margin-top: 28px; }
+  .brand-tag { font-size: var(--fs-label); }
+  .hero-title { font-size: clamp(30px, 6.5vw, 40px); margin: 0 0 12px; line-height: 1.08; }
+  .lede { font-size: var(--fs-lede); line-height: 1.55; color: var(--text-muted); max-width: 58ch; margin: 0; }
+  .meta-row { display: flex; gap: 14px 24px; flex-wrap: wrap; margin: 24px 0; font-size: var(--fs-small); line-height: 1.4; }
+  .meta-row div b { display: block; font-size: var(--fs-label); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+  .intro-copy { font-size: var(--fs-body); line-height: 1.55; margin: 8px 0 0; }
+  .name-input {
+    width: 100%; padding: 13px 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); font-family: inherit;
+    font-size: 16px; /* 16px minimum: smaller makes iOS zoom in on focus */
+  }
+  .foot-note { font-size: var(--fs-foot); line-height: 1.6; color: var(--text-muted); margin-top: 28px; }
+  /* On a phone the intro fills the screen, with the footnote settling at
+     the bottom rather than leaving a blank lower half. */
+  #screen-intro.active { display: flex; flex-direction: column; min-height: calc(100vh - 150px); min-height: calc(100svh - 150px); }
+  #screen-intro .foot-note { margin-top: auto; padding-top: 28px; }
 
   /* ---- Progress ---- */
   .progress-shell {
-    position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg);
+    position: sticky; top: env(safe-area-inset-top, 0px);
+    background: var(--bg); /* opaque, so text scrolling beneath never shows through */
     padding-top: 14px; padding-bottom: 10px; z-index: 5;
     border-bottom: 1px solid var(--border);
   }
   .progress-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 7px; }
+  /* Animated with transform, not width: a width transition re-ran
+     layout and repainted the header on every frame after each tap. */
+  .progress-fill {
+    height: 100%; width: 100%; background: var(--accent); border-radius: 999px;
+    transform: scaleX(0); transform-origin: left center; transition: transform 0.25s ease;
+  }
+  .progress-label { display: flex; justify-content: space-between; font-size: var(--fs-label); color: var(--text-muted); margin-top: 7px; }
 
   /* ---- Question groups ---- */
   .part-title { margin: 30px 0 4px; }
@@ -129,20 +175,35 @@
   .scale-legend span:last-child { text-align: right; }
   .scale-legend-sticky {
     margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
-    font-weight: 700; color: var(--text);
+    font-weight: 700; color: var(--text); background: var(--bg);
   }
+  /* Phones: a larger, full-contrast legend in sentence case, each label
+     centered over its answer button (same 6px gutters as .scale-row). */
+  @media (max-width: 520px) {
+    .scale-legend-sticky {
+      gap: 6px; padding: 10px 0 0; font-size: 13px; line-height: 1.2;
+      text-transform: none; letter-spacing: 0; color: var(--text);
+    }
+    .scale-legend-sticky span,
+    .scale-legend-sticky span:first-child,
+    .scale-legend-sticky span:last-child { text-align: center; white-space: nowrap; min-width: 0; }
+  }
+  @media (max-width: 370px) { .scale-legend-sticky { font-size: 12.5px; } }
 
   fieldset.item {
     border: none; margin: 0; padding: 16px 0; border-bottom: 1px solid var(--border);
+    scroll-margin-top: calc(var(--sticky-h) + 12px);
   }
   fieldset.item:last-child { border-bottom: none; }
-  fieldset.item legend { font-size: 15px; line-height: 1.42; padding: 0 0 12px; float: left; width: 100%; }
+  fieldset.item legend { font-size: var(--fs-question); line-height: 1.45; padding: 0 0 12px; float: left; width: 100%; }
   .item-num { color: var(--accent); font-weight: 700; margin-right: 6px; font-variant-numeric: tabular-nums; }
   .scale-row { display: flex; gap: 6px; clear: both; }
   .scale-row label {
-    flex: 1; text-align: center; padding: 9px 2px; border-radius: 9px; border: 1px solid var(--border);
-    font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;
-    background: var(--surface-2); transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    flex: 1; text-align: center; padding: 11px 2px; border-radius: 9px; border: 1px solid var(--border);
+    font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; user-select: none;
+    /* No color transition: the selected state applies in one frame. A
+       fade restyled and repainted two buttons every frame after a tap. */
+    background: var(--surface-2);
   }
   .scale-row input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
   .scale-row input:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -151,7 +212,7 @@
 
   .warn-banner {
     display: none; background: var(--surface-2); border: 1px solid var(--caution); color: var(--text);
-    border-radius: 10px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 16px;
+    border-radius: 10px; padding: 12px 14px; font-size: var(--fs-small); line-height: 1.5; margin-bottom: 16px;
   }
   .warn-banner.show { display: block; }
 
@@ -170,25 +231,25 @@
   #gap-notes:empty { display: none; }
 
   .domain-heading { display: flex; align-items: center; gap: 10px; }
-  .domain-heading h2 { margin: 0; font-size: 20px; }
+  .domain-heading h2 { margin: 0; font-size: clamp(19px, 18.4px + 0.2vw, 20px); }
   .domain-dot { width: 10px; height: 10px; border-radius: 50%; }
   .bar-row { display: grid; grid-template-columns: 128px 1fr 34px; gap: 10px; align-items: center; }
-  .bar-name { font-size: 13.5px; font-weight: 600; }
+  .bar-name { font-size: var(--fs-small); font-weight: 600; line-height: 1.3; }
   .bar-track { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 999px; }
-  .bar-score { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--text-muted); text-align: right; }
+  .bar-score { font-size: clamp(13px, 12.8px + 0.05vw, 13px); font-variant-numeric: tabular-nums; color: var(--text-muted); text-align: right; }
 
   .callout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 520px) { .callout-grid { grid-template-columns: 1fr; } }
   .callout { border-radius: 12px; padding: 24px; background: var(--surface-2); }
-  .callout h3 { margin: 0 0 8px; font-size: 14px; }
-  .callout ul { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.6; }
+  .callout h3 { margin: 0 0 8px; font-size: clamp(15px, 14.7px + 0.1vw, 15px); }
+  .callout ul { margin: 0; padding-left: 18px; font-size: var(--fs-small); line-height: 1.6; }
 
-  .gap-note { border-left: 3px solid var(--accent-2); padding: 24px; font-size: 13.5px; line-height: 1.55; background: var(--surface-2); border-radius: 0 8px 8px 0; }
+  .gap-note { border-left: 3px solid var(--accent-2); padding: 24px; font-size: var(--fs-small); line-height: 1.55; background: var(--surface-2); border-radius: 0 8px 8px 0; }
 
-  table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: clamp(13px, 12.8px + 0.05vw, 13px); }
   table.data-table th, table.data-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); }
-  table.data-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.04em; }
+  table.data-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: clamp(11px, 10.8px + 0.05vw, 11px); letter-spacing: 0.04em; }
   table.data-table tbody tr:nth-child(even) td { background: var(--surface-2); }
   .table-wrap { overflow-x: auto; }
 
@@ -207,7 +268,7 @@
 <div class="wrap">
   <div class="brandbar">
     <div class="brandmark">PLAYMAKER <span>SPORTS</span></div>
-    <div class="subtle" style="font-size:12.5px;">Mental Performance Coaching · Confidential</div>
+    <div class="subtle brand-tag">Mental Performance Coaching · Confidential</div>
   </div>
 
   <!-- ============ SCREEN 1: INTRO ============ -->
@@ -225,22 +286,22 @@
     <div class="card stack">
       <div>
         <strong>Before you start</strong>
-        <p class="subtle" style="font-size:14px; line-height:1.55; margin:8px 0 0;">There are no right or wrong answers here, only honest ones. Answer based on how you actually train and compete right now, not how you wish you did. Go with your first instinct rather than overthinking any one item.</p>
+        <p class="subtle intro-copy">There are no right or wrong answers here, only honest ones. Answer based on how you actually train and compete right now, not how you wish you did. Go with your first instinct rather than overthinking any one item.</p>
       </div>
       <div>
         <strong>What happens to your answers</strong>
-        <p class="subtle" style="font-size:14px; line-height:1.55; margin:8px 0 0;">Your report is generated right here in your browser once you finish, and a copy is sent to your coach automatically. You'll also get your own copy on screen, with the option to download it as a PDF.</p>
+        <p class="subtle intro-copy">Your report is generated right here in your browser once you finish, and a copy is sent to your coach automatically. You'll also get your own copy on screen, with the option to download it as a PDF.</p>
       </div>
       <div>
-        <label for="input-name" style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Your name</label>
-        <input type="text" id="input-name" placeholder="So your coach knows whose results these are" style="width:100%; padding:11px 14px; border-radius:9px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:14.5px; font-family:inherit;">
+        <label for="input-name" style="font-size:var(--fs-small); font-weight:600; display:block; margin-bottom:6px;">Your name</label>
+        <input type="text" id="input-name" placeholder="So your coach knows it’s you" class="name-input" autocomplete="name">
       </div>
     </div>
 
     <div class="btn-row" style="margin-top:24px;">
       <button class="btn-primary" id="btn-start">Begin Assessment</button>
     </div>
-    <p class="subtle" id="name-warning" style="font-size:12.5px; margin-top:8px; display:none;">Add your name above first, so your coach knows whose report this is.</p>
+    <p class="subtle" id="name-warning" style="font-size:var(--fs-small); margin-top:8px; display:none;">Add your name above first, so your coach knows whose report this is.</p>
 
     <p class="foot-note">Adapted from the Test of Performance Strategies (Thomas, Murphy &amp; Hardy, 1999) and its 2010 factor-refined version, TOPS&#8209;2 (Hardy, Roberts, Thomas &amp; Murphy, <em>Psychology of Sport and Exercise</em>). Used here for individual coaching purposes only. This is a coaching tool, not a clinical or diagnostic instrument.</p>
   </section>
@@ -248,7 +309,7 @@
   <!-- ============ SCREEN 2: QUESTIONNAIRE ============ -->
   <section id="screen-form" class="screen">
     <div class="progress-shell">
-      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
       <div class="progress-label"><span id="progress-text">0 of 64 answered</span><span id="progress-part">Part 1 of 2 &middot; Training</span></div>
       <div class="scale-legend scale-legend-sticky"><span>Never</span><span>Rarely</span><span>Sometimes</span><span>Often</span><span>Always</span></div>
     </div>
@@ -257,13 +318,13 @@
 
     <div id="part-practice">
       <h2 class="part-title">Part 1 &middot; Training &amp; Practice</h2>
-      <p class="subtle" style="font-size:14px;">Think about how you typically train, day to day, not one specific session.</p>
+      <p class="subtle" style="font-size:var(--fs-body);">Think about how you typically train, day to day, not one specific session.</p>
       <div id="items-practice"></div>
     </div>
 
     <div id="part-competition" hidden>
       <h2 class="part-title">Part 2 &middot; Competition</h2>
-      <p class="subtle" style="font-size:14px;">Now think about how you typically feel and act during actual matches.</p>
+      <p class="subtle" style="font-size:var(--fs-body);">Now think about how you typically feel and act during actual matches.</p>
       <div id="items-competition"></div>
     </div>
 
@@ -323,8 +384,8 @@
       <button class="btn-ghost" id="btn-share" hidden>Send to Coach</button>
       <button class="btn-ghost" id="btn-restart">Start Over</button>
     </div>
-    <p class="subtle" id="email-fallback" style="font-size:12.5px; margin-top:10px;">A copy was already sent to your coach automatically. If you'd like to send it yourself too, email the downloaded PDF to <a href="mailto:kspradham.playmaker@gmail.com?subject=My%20Mental%20Performance%20Profile%20(TOPS-2)&amp;body=Hi%20KSP%2C%0A%0AAttaching%20my%20TOPS-2%20report%20(please%20attach%20the%20PDF%20you%20just%20downloaded).%0A%0A">kspradham.playmaker@gmail.com</a>.</p>
-    <p class="subtle" id="pdf-status" style="font-size:12.5px; margin-top:6px;"></p>
+    <p class="subtle" id="email-fallback" style="font-size:var(--fs-small); line-height:1.5; margin-top:10px;">A copy was already sent to your coach automatically. If you'd like to send it yourself too, email the downloaded PDF to <a href="mailto:kspradham.playmaker@gmail.com?subject=My%20Mental%20Performance%20Profile%20(TOPS-2)&amp;body=Hi%20KSP%2C%0A%0AAttaching%20my%20TOPS-2%20report%20(please%20attach%20the%20PDF%20you%20just%20downloaded).%0A%0A">kspradham.playmaker@gmail.com</a>.</p>
+    <p class="subtle" id="pdf-status" style="font-size:var(--fs-small); margin-top:6px;"></p>
   </section>
 </div>
 
@@ -522,7 +583,7 @@
 
   function updateProgress() {
     var answered = Object.keys(answers).length;
-    document.getElementById("progress-fill").style.width = Math.round((answered / 64) * 100) + "%";
+    document.getElementById("progress-fill").style.transform = "scaleX(" + (answered / 64) + ")";
     document.getElementById("progress-text").textContent = answered + " of 64 answered";
   }
 
@@ -545,10 +606,38 @@
     form: document.getElementById("screen-form"),
     report: document.getElementById("screen-report")
   };
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+  // Keep --sticky-h equal to the sticky progress header's real height, so
+  // scroll-padding/scroll-margin always land items just below it.
+  var progressShell = document.querySelector(".progress-shell");
+  function syncStickyHeight() {
+    document.documentElement.style.setProperty("--sticky-h", progressShell.offsetHeight + "px");
+  }
+  if (window.ResizeObserver) new ResizeObserver(syncStickyHeight).observe(progressShell);
+
+  // Jump to the top of the page once the new screen has laid out. Doing
+  // it synchronously raced both the screen swap and, on phones, the
+  // on-screen keyboard closing (which resizes the viewport and restores
+  // its own scroll position), so it landed mid-list. Blur first, then
+  // scroll on the next frames, then once more after the keyboard settles.
+  function scrollToTop() {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    function go() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+    go();
+    requestAnimationFrame(function () { requestAnimationFrame(go); });
+    setTimeout(go, 350);
+  }
+
   function show(name) {
     Object.keys(screens).forEach(function (k) { screens[k].classList.toggle("active", k === name); });
     document.querySelector(".wrap").classList.toggle("is-report", name === "report");
-    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    if (name === "form") syncStickyHeight();
+    scrollToTop();
   }
 
   document.getElementById("btn-start").addEventListener("click", function () {
@@ -560,8 +649,8 @@
       return;
     }
     window._respondentName = name;
-    show("form");
     document.getElementById("btn-back-intro").hidden = false;
+    show("form");
   });
 
   document.getElementById("btn-back-intro").addEventListener("click", function () {
@@ -592,7 +681,7 @@
     document.getElementById("btn-next-part").hidden = true;
     document.getElementById("btn-submit").hidden = false;
     document.getElementById("progress-part").textContent = "Part 2 of 2 · Competition";
-    window.scrollTo({ top: 0 });
+    scrollToTop();
   });
 
   document.getElementById("btn-submit").addEventListener("click", function () {
@@ -606,8 +695,10 @@
       if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    generateReport();
+    var report = generateReport();
     show("report");
+    // After show(): the PDF is rendered from the visible report.
+    sendToCoach(report.results, report.strengths, report.growth, report.answeredCount);
   });
 
   document.getElementById("btn-restart").addEventListener("click", function () {
@@ -733,7 +824,7 @@
     document.querySelector("#full-table tbody").innerHTML = rows;
 
     window._lastReportText = buildReportText(results, strengths, growth, answeredCount);
-    sendToCoach(results, strengths, growth, answeredCount);
+    return { results: results, strengths: strengths, growth: growth, answeredCount: answeredCount };
   }
 
   function buildReportText(results, strengths, growth, answeredCount) {
@@ -774,7 +865,26 @@
   // Apps Script Web Apps don't return CORS headers, so this uses the
   // standard no-cors workaround and can't confirm delivery from the
   // browser; the Apps Script side is still the source of truth.
+  //
+  // The email carries the same PDF as the Download button, built by
+  // getPdfBlob() (which caches it, so a later Download is instant) and
+  // sent base64-encoded. If the PDF can't be built, the email still goes
+  // out with the text summary alone.
   // ---------------------------------------------------------------
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result).split(",")[1] || ""); };
+      reader.onerror = function () { reject(reader.error); };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function pdfFilename() {
+    var slug = (window._respondentName || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return "mental-performance-profile" + (slug ? "-" + slug : "") + ".pdf";
+  }
+
   function sendToCoach(results, strengths, growth, answeredCount) {
     if (!EMAIL_ENDPOINT || EMAIL_ENDPOINT.indexOf("PASTE_YOUR") === 0) return;
     var payload = {
@@ -786,14 +896,24 @@
       growth: growth.map(function (r) { return { subscale: SUBSCALES[r.key], domain: r.domain }; }),
       reportText: window._lastReportText || ""
     };
-    try {
-      fetch(EMAIL_ENDPOINT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      }).catch(function () { /* best-effort only */ });
-    } catch (e) { /* fetch unsupported or blocked; PDF/share options still work */ }
+    function post() {
+      try {
+        return fetch(EMAIL_ENDPOINT, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }).catch(function () { /* best-effort only */ });
+      } catch (e) { /* fetch unsupported or blocked; PDF/share options still work */ }
+    }
+    getPdfBlob()
+      .then(blobToBase64)
+      .then(function (b64) {
+        payload.pdfBase64 = b64;
+        payload.pdfFilename = pdfFilename();
+      })
+      .catch(function () { /* no PDF; send the text summary alone */ })
+      .then(post);
   }
 
   // ---------------------------------------------------------------
@@ -810,8 +930,10 @@
     document.getElementById("pdf-status").textContent = msg || "";
   }
 
-  var cachedPdfBlob = null;
-  var cachedPdfKey = null;
+  // { key, promise } for the current report. Holding the promise, not
+  // just the finished blob, lets the automatic email and a Download tap
+  // share one render even when they overlap.
+  var cachedPdf = null;
 
   var PDF_MARGIN = 32; // pt, on all four sides of every page
   // html2canvas lays out its clone of the page in a window this wide, so
@@ -881,13 +1003,19 @@
     return slices;
   }
 
-  // Renders #pdf-capture to a PDF (one or more pages, broken only
-  // between sections or table rows) and caches the blob keyed to the
-  // current report so repeat clicks (Download, then Send to Coach)
-  // don't re-render from scratch.
+  // Returns the PDF for the current report, rendering it at most once.
   function getPdfBlob() {
     var key = window._lastReportText || "";
-    if (cachedPdfBlob && cachedPdfKey === key) return Promise.resolve(cachedPdfBlob);
+    if (cachedPdf && cachedPdf.key === key) return cachedPdf.promise;
+    var promise = renderPdfBlob();
+    cachedPdf = { key: key, promise: promise };
+    promise.catch(function () { if (cachedPdf && cachedPdf.promise === promise) cachedPdf = null; });
+    return promise;
+  }
+
+  // Renders #pdf-capture to a PDF (one or more pages, broken only
+  // between sections or table rows).
+  function renderPdfBlob() {
     if (!window.html2canvas || !window.jspdf) {
       return Promise.reject(new Error("PDF libraries did not load"));
     }
@@ -939,10 +1067,7 @@
         // two-page report tens of MB; at 0.92 text stays crisp.
         pdf.addImage(page.toDataURL("image/jpeg", 0.92), "JPEG", PDF_MARGIN, PDF_MARGIN, contentW, (sh / s) * ptPerPx);
       });
-      var blob = pdf.output("blob");
-      cachedPdfBlob = blob;
-      cachedPdfKey = key;
-      return blob;
+      return pdf.output("blob");
     });
   }
 
