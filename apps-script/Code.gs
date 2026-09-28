@@ -2,9 +2,10 @@
  * TOPS-2 assessment backend.
  *
  * Deployed as a Google Apps Script Web App, this receives one POST per
- * completed assessment from the page's sendToCoach() function, emails the
- * coach the respondent's PDF report (attached) with a short text summary,
- * and logs the submission to a Google Sheet.
+ * completed assessment from the page's sendToCoach() function, saves the
+ * respondent's PDF report to a "TOPS-2 Submissions" folder in Drive, emails
+ * the coach a link to it with a text summary, and logs the submission to a
+ * Google Sheet.
  *
  * SETUP
  * 1. Go to script.google.com, create a new project, and paste this file's
@@ -57,24 +58,84 @@ function logToSheet(data) {
   ]);
 }
 
+// The PDF is saved to Drive and linked from the email rather than
+// attached: Gmail rejected (5.7.1) the attachment version of this email.
 function sendEmail(data) {
   var name = data.name || "(not given)";
   var subject = "TOPS-2 Mental Performance Profile (" + name + ")";
   var summary = data.reportText || "A new TOPS-2 assessment was completed, but no report text was attached.";
-  var options = {};
   var intro;
+  var pdfUrl = null;
   // The page sends the same PDF the respondent can download, base64-encoded.
-  // If it's missing (the browser couldn't build it), the text summary still goes out.
+  // If it's missing or can't be saved, the text summary still goes out.
   if (data.pdfBase64) {
-    var filename = data.pdfFilename || "mental-performance-profile.pdf";
-    options.attachments = [
-      Utilities.newBlob(Utilities.base64Decode(data.pdfBase64), "application/pdf", filename)
-    ];
-    intro = name + " completed the TOPS-2 assessment. Their full report is attached as a PDF; a text summary follows.";
+    try {
+      pdfUrl = savePdfToDrive(data.pdfBase64, data.pdfFilename);
+    } catch (err) {
+      console.error("Saving PDF to Drive failed: " + err);
+    }
+  }
+  if (pdfUrl) {
+    intro = name + " completed the TOPS-2 assessment. Their full PDF report is saved in your Drive (" +
+      SUBMISSIONS_FOLDER + "):\n" + pdfUrl + "\n\nA text summary follows.";
+  } else if (data.pdfBase64) {
+    intro = name + " completed the TOPS-2 assessment. (Their PDF couldn't be saved to Drive, so only the text summary is included.)";
   } else {
     intro = name + " completed the TOPS-2 assessment. (The PDF couldn't be generated in their browser, so only the text summary is included.)";
   }
-  GmailApp.sendEmail(COACH_EMAIL, subject, intro + "\n\n" + summary, options);
+  GmailApp.sendEmail(COACH_EMAIL, subject, intro + "\n\n" + summary);
+}
+
+var SUBMISSIONS_FOLDER = "TOPS-2 Submissions";
+
+// Drive access goes through the Drive API (the "Drive" advanced service,
+// enabled in appsscript.json), not DriveApp: DriveApp demands the full
+// "all of your Drive files" scope even to create a folder, while the
+// Drive API works with the narrow drive.file scope, which only covers
+// files and folders this script created itself.
+
+// Saves the PDF into the "TOPS-2 Submissions" Drive folder (created on
+// first use) and returns the file's link. The file stays private to the
+// script owner, who is also the coach receiving the email.
+function savePdfToDrive(pdfBase64, pdfFilename) {
+  var stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HHmm");
+  var filename = stamp + " " + (pdfFilename || "mental-performance-profile.pdf");
+  var blob = Utilities.newBlob(Utilities.base64Decode(pdfBase64), "application/pdf", filename);
+  var file = Drive.Files.create(
+    { name: filename, mimeType: "application/pdf", parents: [getSubmissionsFolderId()] },
+    blob,
+    { fields: "id,webViewLink" }
+  );
+  return file.webViewLink;
+}
+
+// The folder is created once and then opened by its stored ID (Script
+// Properties), never searched for by name, since drive.file can't see
+// folders by name. It's only recreated if the stored ID is missing or the
+// folder was trashed or deleted. A lock stops two simultaneous first
+// submissions from each creating a folder.
+function getSubmissionsFolderId() {
+  var props = PropertiesService.getScriptProperties();
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var id = props.getProperty("SUBMISSIONS_FOLDER_ID");
+    if (id) {
+      try {
+        var saved = Drive.Files.get(id, { fields: "id,trashed" });
+        if (!saved.trashed) return saved.id;
+      } catch (err) { /* deleted or no longer accessible; recreate below */ }
+    }
+    var folder = Drive.Files.create(
+      { name: SUBMISSIONS_FOLDER, mimeType: "application/vnd.google-apps.folder" },
+      null,
+      { fields: "id" }
+    );
+    props.setProperty("SUBMISSIONS_FOLDER_ID", folder.id);
+    return folder.id;
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
